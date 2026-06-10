@@ -877,7 +877,7 @@
           eraseText(line0Text, 35, () => {
             setTimeout(() => cyclePhrase(idx + 1, done), 120);
           });
-        }, idx === 0 ? 900 : 500);
+        }, idx === 0 ? 600 : 300);
       });
     }
 
@@ -889,20 +889,20 @@
         // -- Línea 1 aparece --
         setTimeout(() => {
           line1El.classList.add('show');
-          typeText(line1Text, line1Cur, phrase1, 52, () => {
+          typeText(line1Text, line1Cur, phrase1, 41, () => {
             line1Cur.style.display = 'none';
 
             // -- Línea 2 grande: primera parte --
             setTimeout(() => {
               line2El.classList.add('show');
-              typeText(line2Text, line2Cur, phrase2, 55, () => {
+              typeText(line2Text, line2Cur, phrase2, 43, () => {
                 line2Cur.style.display = 'none';
 
                 // Breve pausa, luego cambiar a frase 3
                 setTimeout(() => {
                   eraseText(line2Text, 25, () => {
                     line2Cur.style.display = 'inline-block';
-                    typeText(line2Text, line2Cur, phrase3, 75, () => {
+                    typeText(line2Text, line2Cur, phrase3, 50, () => {
                       line2Cur.style.display = 'none';
 
                       // Pausa final y fade a la carta
@@ -912,10 +912,10 @@
                         setTimeout(() => {
                           twScreen.style.display = 'none';
                         }, 1300);
-                      }, 1800);
+                      }, 1200);
                     });
                   });
-                }, 900);
+                }, 500);
               });
             }, 600);
           });

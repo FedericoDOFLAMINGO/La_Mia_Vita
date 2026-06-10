@@ -1,0 +1,928 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para ti, mi todo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Great+Vibes&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #050a18;
+    --deep:    #080f24;
+    --mid:     #0d1a35;
+    --parchment: rgba(255,248,235,0.06);
+    --ink:     rgba(255,248,235,0.88);
+    --ink-soft: rgba(255,248,235,0.65);
+    --gold:    #c9a96e;
+    --gold-dim: rgba(201,169,110,0.35);
+    --rose:    #e8a5b0;
+    --rose-dim: rgba(232,165,176,0.25);
+    --glow:    rgba(201,169,110,0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--ink);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 1.9;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── CANVAS capas ── */
+  #sky, #rain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  #sky  { z-index: 0; }
+  #rain { z-index: 1; opacity: .55; }
+
+  /* ── CONTENIDO ── */
+  .wrap {
+    position: relative;
+    z-index: 10;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 80px 28px 100px;
+  }
+
+  /* ── ENCABEZADO ── */
+  .header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .header .eyebrow {
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: .8;
+    margin-bottom: 18px;
+  }
+  .header h1 {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(52px, 10vw, 82px);
+    font-weight: 400;
+    color: var(--gold);
+    text-shadow:
+      0 0 40px rgba(201,169,110,.45),
+      0 0 80px rgba(201,169,110,.2);
+    line-height: 1.1;
+  }
+  .header .sub {
+    margin-top: 14px;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-soft);
+    letter-spacing: .04em;
+  }
+
+  /* ── DIVISOR ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 44px 0;
+    opacity: .5;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .divider span {
+    font-size: 18px;
+    color: var(--rose);
+  }
+
+  /* ── CARTA ── */
+  .letter {
+    background: var(--parchment);
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    padding: 50px 44px;
+    backdrop-filter: blur(6px);
+    box-shadow:
+      0 0 60px rgba(0,0,0,.45),
+      inset 0 0 80px rgba(201,169,110,.03);
+  }
+  @media(max-width:520px){ .letter{ padding: 34px 20px; } }
+
+  .letter p {
+    margin-bottom: 22px;
+    font-size: clamp(16px, 2.2vw, 18.5px);
+    color: var(--ink);
+    text-align: justify;
+    hyphens: auto;
+  }
+  .letter p:last-child { margin-bottom: 0; }
+
+  .letter em {
+    font-style: italic;
+    color: var(--rose);
+  }
+
+  .letter strong {
+    font-weight: 400;
+    color: var(--gold);
+  }
+
+  .saludo {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(28px, 5vw, 38px);
+    color: var(--gold);
+    display: block;
+    text-align: center;
+    margin-bottom: 32px;
+    text-shadow: 0 0 24px rgba(201,169,110,.35);
+  }
+
+  /* ── MARCO DE FOTO ── */
+  .photo-frame {
+    margin: 42px auto;
+    width: min(100%, 380px);
+    display: block;
+  }
+  .photo-frame .inner {
+    position: relative;
+    border: 1px solid var(--gold-dim);
+    padding: 10px;
+    background: rgba(5,10,24,.55);
+    box-shadow:
+      0 0 0 1px rgba(201,169,110,.1),
+      0 12px 48px rgba(0,0,0,.55),
+      0 0 80px rgba(232,165,176,.07);
+  }
+  .photo-frame .inner::before,
+  .photo-frame .inner::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-color: var(--gold);
+    border-style: solid;
+    opacity: .7;
+  }
+  .photo-frame .inner::before { top: 4px; left: 4px; border-width: 2px 0 0 2px; }
+  .photo-frame .inner::after  { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; }
+
+  .photo-frame img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 4/5;
+    filter: sepia(.12) brightness(.95);
+    transition: filter .5s;
+  }
+  .photo-frame:hover img { filter: sepia(0) brightness(1); }
+
+  .photo-frame .caption {
+    text-align: center;
+    font-family: 'Great Vibes', cursive;
+    font-size: 22px;
+    color: var(--gold);
+    padding: 10px 0 4px;
+    opacity: .85;
+  }
+
+  /* ── FIRMA ── */
+  .firma {
+    text-align: right;
+    margin-top: 44px;
+    padding-top: 32px;
+    border-top: 1px solid var(--gold-dim);
+  }
+  .firma .nombre {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(32px, 6vw, 48px);
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(201,169,110,.4);
+  }
+  .firma .nota {
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: .04em;
+    margin-top: 4px;
+  }
+
+  /* ── CORAZÓN FLOTANTE ── */
+  .hearts-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+  }
+  .h {
+    position: absolute;
+    bottom: -60px;
+    font-size: 14px;
+    opacity: 0;
+    animation: floatUp linear infinite;
+    color: var(--rose);
+    text-shadow: 0 0 8px rgba(232,165,176,.6);
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) scale(1) rotate(-10deg); opacity: 0; }
+    10%  { opacity: .45; }
+    90%  { opacity: .2; }
+    100% { transform: translateY(-105vh) scale(.5) rotate(15deg); opacity: 0; }
+  }
+
+  /* ── PANTALLA DE BIENVENIDA ── */
+  #welcome {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #0d1a35 0%, #050a18 70%);
+    transition: opacity .9s ease, visibility .9s ease;
+  }
+  #welcome.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* partículas de fondo en el welcome */
+  #welcome-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .welcome-inner {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 40px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .welcome-eyebrow {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: .45em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: .7;
+    margin-bottom: 20px;
+  }
+
+  .welcome-title {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(54px, 14vw, 96px);
+    color: var(--gold);
+    line-height: 1.05;
+    text-shadow:
+      0 0 50px rgba(201,169,110,.5),
+      0 0 100px rgba(201,169,110,.2);
+    margin-bottom: 12px;
+  }
+
+  .welcome-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(15px, 2.5vw, 18px);
+    color: var(--ink-soft);
+    letter-spacing: .05em;
+    margin-bottom: 52px;
+    max-width: 380px;
+  }
+
+  /* botón abrir carta */
+  .btn-open {
+    position: relative;
+    cursor: pointer;
+    border: 1px solid var(--gold-dim);
+    background: transparent;
+    padding: 16px 48px;
+    color: var(--gold);
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: background .3s, border-color .3s, box-shadow .3s;
+    overflow: hidden;
+  }
+  .btn-open::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(201,169,110,.18) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity .4s;
+  }
+  .btn-open:hover::before { opacity: 1; }
+  .btn-open:hover {
+    border-color: rgba(201,169,110,.7);
+    box-shadow: 0 0 30px rgba(201,169,110,.2);
+  }
+
+  /* corazón pulsante bajo el botón */
+  .welcome-heart {
+    margin-top: 36px;
+    font-size: 22px;
+    color: var(--rose);
+    animation: pulse 2.2s ease-in-out infinite;
+    text-shadow: 0 0 14px rgba(232,165,176,.55);
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1);   opacity: .7; }
+    50%       { transform: scale(1.25); opacity: 1;  }
+  }
+
+  /* nota de música */
+  .music-note {
+    margin-top: 16px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    opacity: .5;
+  }
+
+  /* ── PANTALLA INTERMEDIA (typewriter) ── */
+  #typewriter-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #0d1a35 0%, #050a18 70%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .7s ease;
+  }
+  #typewriter-screen.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  #typewriter-screen.fade-out {
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+
+  .tw-inner {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 40px 32px;
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .tw-line {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(18px, 3.5vw, 26px);
+    color: var(--ink-soft);
+    letter-spacing: .04em;
+    line-height: 1.7;
+    min-height: 2em;
+    margin-bottom: 10px;
+    opacity: 0;
+    transition: opacity .5s ease;
+  }
+  .tw-line.show { opacity: 1; }
+
+  .tw-line.highlight {
+    font-family: 'Great Vibes', cursive;
+    font-style: normal;
+    font-size: clamp(28px, 5vw, 42px);
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(201,169,110,.4);
+    margin-top: 14px;
+    margin-bottom: 0;
+  }
+
+  .tw-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    background: var(--gold);
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    animation: blink .7s step-end infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+
+  #tw-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- AUDIO -->
+<audio id="bgm" loop preload="auto">
+  <source src="MONCOEUR.mp3" type="audio/mpeg">
+</audio>
+
+<!-- PANTALLA DE BIENVENIDA -->
+<div id="welcome">
+  <canvas id="welcome-canvas"></canvas>
+  <div class="welcome-inner">
+    <p class="welcome-eyebrow">Solo para ti</p>
+    <h1 class="welcome-title">Angy</h1>
+    <p class="welcome-sub">Hay algo aquí escrito con todo mi corazón, esperando que lo leas</p>
+    <button class="btn-open" id="btn-open">Abrir la carta</button>
+    <div class="welcome-heart">♡</div>
+    <p class="music-note">♪ la música comenzará al entrar</p>
+  </div>
+</div>
+
+<!-- PANTALLA INTERMEDIA TYPEWRITER -->
+<div id="typewriter-screen">
+  <canvas id="tw-canvas"></canvas>
+  <div class="tw-inner">
+    <div class="tw-line" id="tw0"><span id="tw0-text"></span><span class="tw-cursor" id="tw0-cur"></span></div>
+    <div class="tw-line" id="tw1"><span id="tw1-text"></span><span class="tw-cursor" id="tw1-cur"></span></div>
+    <div class="tw-line highlight" id="tw2"><span id="tw2-text"></span><span class="tw-cursor" id="tw2-cur"></span></div>
+  </div>
+</div>
+
+<canvas id="sky"></canvas>
+<canvas id="rain"></canvas>
+<div class="hearts-bg" id="hearts"></div>
+
+<div class="wrap">
+
+  <header class="header">
+    <p class="eyebrow">Una carta para leer con el corazón</p>
+    <h1>Para ti, mi vida entera</h1>
+    <p class="sub">Escrita con todo lo que soy, para la mujer que lo es todo para mí</p>
+  </header>
+
+  <article class="letter">
+
+    <span class="saludo">Amor mío…</span>
+
+    <p>
+      Hay noches en que me quedo mirando el techo y no encuentro palabras suficientes para describir
+      lo que me haces sentir. Y nunca llegó a terminar de pensar en lo mucho que me haces feliz,
+      y todo el amor que me das; <em>Te agradezco y nunca serán suficientes las veces que te lo diga</em>.
+      Pero debes saber que desde que llegaste a mi vida algo dentro de mí cambió para siempre,
+      como si todo lo que existía antes fuera preparado para lo que iba a venir contigo. 
+      Para todo lo bonito y todo momento tan especial a tu lado.
+    </p>
+
+    <p>
+      <strong>Me muero de amor por ti.</strong> Y no es un decir, es lo más honesto que he sentido jamás.
+      Cada vez que te veo, cada vez que escucho tu voz, algo en mi pecho aprieta tan fuerte, 
+      el amor que siento por ti que es tan incontenible tan puro, tan incomparable. Un Amor
+      que sólo tu eres merecedora y dueña al completo de tood lo que siento.
+    </p>
+
+    <div class="divider"><span>♡</span></div>
+
+    <!-- FOTO 1 -->
+    <div class="photo-frame">
+      <div class="inner">
+        <img src="foto1.jpg" alt="Tú">
+        <p class="caption">Mi favorita del universo</p>
+      </div>
+    </div>
+
+    <p>
+      Quiero que no te quede ninguna duda: <em>tú eres absolutamente todo para mí.</em>
+      Eres el pensamiento con el que abro los ojos y el último que tengo antes de dormir.
+      Eres el motivo por el que quiero ser mejor persona cada día, porque alguien como tú
+      se merece a alguien que dé lo mejor de sí mismo sin reservas.
+    </p>
+
+    <p>
+      Y lo haría todo. Absolutamente <strong>todo</strong>. Movería lo que hubiera que mover,
+      cruzaría lo que hubiera que cruzar, cedería lo que fuera necesario con tal de que tú estés bien,
+      de que tú seas feliz, de que tú sientas que alguien en este mundo te cuida
+      como si fueras lo más valioso que existe.
+      Porque para mí lo eres.
+    </p>
+
+    <p>
+      Te amaré con todo lo que soy. Con mis defectos y mis virtudes, con mis miedos y mi valentía,
+      con cada parte de mí que todavía estoy descubriendo. Te quiero con mi vida, literalmente,
+      y te quiero eternamente, en esta vida entera, y una eternidad más si me la dan.
+      Quiero estar contigo en esta y en todas las que tengamos, en cada versión
+      del universo donde existamos los dos.
+    </p>
+
+    <div class="divider"><span>♡</span></div>
+
+    <!-- FOTO 2 -->
+    <div class="photo-frame">
+      <div class="inner">
+        <img src="foto2.jpg" alt="Tú y yo">
+        <p class="caption">Aquí vivo yo</p>
+      </div>
+    </div>
+
+    <p>
+      Soy envidioso, sí. Lo sé y no me avergüenza. Te quiero completamente para mí, 
+      pero no por egoísmo o puede que si, por eso y por avaricioso, porque tu lo eres todo
+      y yo lo quiero todo porque no sólo lo eres todo, eres lo mejor, y yo como el hambreado,
+      y avaricioso que soy, quiero tenerte completamente para mí, porque no quiero que nadie
+      más conozca todo tu amor, todo lo que eres, toda tu esencia, pero también porque
+      <em>nadie más te va a cuidar como yo.</em> Nadie más va a dedicarte el tiempo,
+      la atención y el amor que tú mereces de la manera en que yo lo hago.
+      Eso no lo cambio por nada.
+    </p>
+
+    <p>
+      No quiero que nadie más conozca tu parte linda. Esa parte que solo aparece cuando estás
+      de verdad cómoda, cuando te ríes sin pensarlo, cuando bajan todas las capas y quedas tú,
+      <strong>tú siendo tú.</strong> Tus ojitos cuando sonríes de verdad,
+      no la sonrisa de cortesía, sino esa, la que te nace desde adentro y hace que todo lo demás desaparezca.
+      Esa mirada la quiero solo para mí porque es el privilegio y el tesoro  más grande que me ha dado la vida,
+      y que atesoro en todo momento, recordandolo con  inmenso cariño. 
+    </p>
+
+    <p>
+      No quiero que nadie más te vea siendo tan amable, tan genuina.
+      Tan increíblemente tú. Porque esa versión de ti, la real, la sin filtros,
+      la linda de alma, es mía. Y la cuido como el tesoro que es.
+    </p>
+
+    <p>
+      No soy perfecto. Pero <em>amarte a ti</em> es lo más perfecto que he hecho en mi vida.
+      Y lo haré todos los días que me queden, en cada forma que pueda,
+      con todo lo que tengo y con todo lo que llegue a ser.
+    </p>
+
+    <p>
+      Siempre tuyo. Completamente. Eternamente.
+    </p>
+
+    <div class="firma">
+      <p class="nombre">Tu latoso Fer</p>
+      <p class="nota">con todo mi corazón, para siempre</p>
+    </div>
+
+  </article>
+
+</div>
+
+<script>
+/* ── ESTRELLAS + LLUVIA ── */
+(function(){
+  /* --- CIELO ESTRELLADO --- */
+  const sky = document.getElementById('sky');
+  const sCtx = sky.getContext('2d');
+  let stars = [], W, H;
+
+  function resize(){
+    W = sky.width  = window.innerWidth;
+    H = sky.height = window.innerHeight;
+    document.getElementById('rain').width  = W;
+    document.getElementById('rain').height = H;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function makeStars(){
+    stars = [];
+    const n = Math.floor(W * H / 2800);
+    for(let i = 0; i < n; i++){
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.4 + .2,
+        a: Math.random(),
+        da: (Math.random() - .5) * .008,
+        color: Math.random() < .15
+          ? `hsl(${200 + Math.random()*60},60%,85%)`
+          : `hsl(${40 + Math.random()*20},60%,90%)`
+      });
+    }
+  }
+  makeStars();
+  window.addEventListener('resize', makeStars);
+
+  // degradado base del cielo
+  function drawSky(){
+    const g = sCtx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#020610');
+    g.addColorStop(.5,'#060e20');
+    g.addColorStop(1,'#0a1428');
+    sCtx.fillStyle = g;
+    sCtx.fillRect(0,0,W,H);
+  }
+
+  function animStars(){
+    drawSky();
+    stars.forEach(s => {
+      s.a += s.da;
+      if(s.a > 1 || s.a < .1){ s.da *= -1; }
+      sCtx.beginPath();
+      sCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      sCtx.fillStyle = s.color;
+      sCtx.globalAlpha = s.a;
+      sCtx.fill();
+      sCtx.globalAlpha = 1;
+    });
+    requestAnimationFrame(animStars);
+  }
+  animStars();
+
+  /* --- LLUVIA --- */
+  const rain = document.getElementById('rain');
+  const rCtx = rain.getContext('2d');
+  const DROPS = 160;
+  const drops = [];
+
+  for(let i = 0; i < DROPS; i++){
+    drops.push({
+      x: Math.random() * (typeof W !== 'undefined' ? W : 1200),
+      y: Math.random() * (typeof H !== 'undefined' ? H : 900),
+      len: 12 + Math.random() * 20,
+      speed: 9 + Math.random() * 8,
+      alpha: .08 + Math.random() * .2,
+      width: .5 + Math.random() * .8
+    });
+  }
+
+  function animRain(){
+    rCtx.clearRect(0,0,W,H);
+    drops.forEach(d => {
+      rCtx.beginPath();
+      rCtx.moveTo(d.x, d.y);
+      rCtx.lineTo(d.x - d.len * .25, d.y + d.len);
+      rCtx.strokeStyle = `rgba(180,210,255,${d.alpha})`;
+      rCtx.lineWidth = d.width;
+      rCtx.stroke();
+      d.y += d.speed;
+      d.x -= d.speed * .25;
+      if(d.y > H || d.x < 0){
+        d.y = -20;
+        d.x = Math.random() * W;
+      }
+    });
+    requestAnimationFrame(animRain);
+  }
+  animRain();
+
+  /* --- CORAZONES FLOTANTES --- */
+  const container = document.getElementById('hearts');
+  const symbols = ['♡','❤','💕','✦'];
+  function spawnHeart(){
+    const el = document.createElement('span');
+    el.className = 'h';
+    el.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    el.style.left = Math.random()*100 + 'vw';
+    const dur = 12 + Math.random()*14;
+    el.style.animationDuration = dur + 's';
+    el.style.animationDelay = Math.random()*4 + 's';
+    el.style.fontSize = (10 + Math.random()*14) + 'px';
+    container.appendChild(el);
+    setTimeout(() => el.remove(), (dur + 4) * 1000);
+  }
+  setInterval(spawnHeart, 1200);
+  for(let i=0;i<6;i++) spawnHeart();
+
+  /* ── WELCOME SCREEN ── */
+  const welcome = document.getElementById('welcome');
+  const btnOpen = document.getElementById('btn-open');
+  const bgm     = document.getElementById('bgm');
+  const wCanvas = document.getElementById('welcome-canvas');
+  const wCtx    = wCanvas.getContext('2d');
+
+  // Partículas en welcome
+  let wW = wCanvas.width  = window.innerWidth;
+  let wH = wCanvas.height = window.innerHeight;
+  window.addEventListener('resize', () => {
+    wW = wCanvas.width  = window.innerWidth;
+    wH = wCanvas.height = window.innerHeight;
+  });
+
+  const wStars = Array.from({length: 120}, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    r: Math.random() * 1.2 + .2,
+    a: Math.random(),
+    da: (Math.random() - .5) * .006
+  }));
+
+  let wRunning = true;
+  function animWelcome(){
+    if(!wRunning) return;
+    // fondo
+    const g = wCtx.createLinearGradient(0,0,0,wH);
+    g.addColorStop(0,'#020610');
+    g.addColorStop(.5,'#060e20');
+    g.addColorStop(1,'#0a1428');
+    wCtx.fillStyle = g;
+    wCtx.fillRect(0,0,wW,wH);
+    // estrellas
+    wStars.forEach(s => {
+      s.a += s.da;
+      if(s.a > 1 || s.a < .08) s.da *= -1;
+      wCtx.beginPath();
+      wCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      wCtx.fillStyle = '#e8d5a8';
+      wCtx.globalAlpha = s.a * .9;
+      wCtx.fill();
+      wCtx.globalAlpha = 1;
+    });
+    requestAnimationFrame(animWelcome);
+  }
+  animWelcome();
+
+  btnOpen.addEventListener('click', () => {
+    // Arrancar música
+    bgm.volume = 0;
+    bgm.play().catch(()=>{});
+    let vol = 0;
+    const fadeIn = setInterval(() => {
+      vol = Math.min(1, vol + 0.04);
+      bgm.volume = vol;
+      if(vol >= 1) clearInterval(fadeIn);
+    }, 80);
+
+    // Ocultar welcome
+    welcome.classList.add('hidden');
+    wRunning = false;
+    setTimeout(() => { wCanvas.remove(); }, 1000);
+
+    // Mostrar pantalla typewriter
+    const twScreen = document.getElementById('typewriter-screen');
+    twScreen.classList.add('visible');
+
+    // Canvas de estrellas para typewriter screen
+    const twCanvas = document.getElementById('tw-canvas');
+    const twCtx = twCanvas.getContext('2d');
+    let twW = twCanvas.width = window.innerWidth;
+    let twH = twCanvas.height = window.innerHeight;
+    window.addEventListener('resize', () => {
+      twW = twCanvas.width = window.innerWidth;
+      twH = twCanvas.height = window.innerHeight;
+    });
+    const twStars = Array.from({length: 100}, () => ({
+      x: Math.random() * twW, y: Math.random() * twH,
+      r: Math.random() * 1.1 + .2, a: Math.random(),
+      da: (Math.random() - .5) * .005
+    }));
+    let twRunning = true;
+    function animTw(){
+      if(!twRunning) return;
+      const g = twCtx.createLinearGradient(0,0,0,twH);
+      g.addColorStop(0,'#020610'); g.addColorStop(.5,'#060e20'); g.addColorStop(1,'#0a1428');
+      twCtx.fillStyle = g; twCtx.fillRect(0,0,twW,twH);
+      twStars.forEach(s => {
+        s.a += s.da;
+        if(s.a > 1 || s.a < .08) s.da *= -1;
+        twCtx.beginPath(); twCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        twCtx.fillStyle = '#e8d5a8'; twCtx.globalAlpha = s.a * .85;
+        twCtx.fill(); twCtx.globalAlpha = 1;
+      });
+      requestAnimationFrame(animTw);
+    }
+    animTw();
+
+    // ── SECUENCIA DE FRASES (22 seg total) ──
+    // Línea 0: escribe la primera frase con máquina de escribir
+    // Línea 1: se borra y escribe la segunda
+    // Línea 2 (grande): aparece la frase final
+    // Luego fade out y aparece la carta
+
+    const line0El   = document.getElementById('tw0');
+    const line0Text = document.getElementById('tw0-text');
+    const line0Cur  = document.getElementById('tw0-cur');
+    const line1El   = document.getElementById('tw1');
+    const line1Text = document.getElementById('tw1-text');
+    const line1Cur  = document.getElementById('tw1-cur');
+    const line2El   = document.getElementById('tw2');
+    const line2Text = document.getElementById('tw2-text');
+    const line2Cur  = document.getElementById('tw2-cur');
+
+    // Frases que aparecen en línea 0 (se reemplazan)
+    const phrases0 = [
+      'Puedo ser gracioso si quieres...',
+      'solemne...',
+      'listo...',
+      'supersticioso...',
+      'valiente...',
+      'incluso bailarín...',
+    ];
+    // Frase línea 1
+    const phrase1 = 'Sería lo que quieras que sea...';
+    // Frase grande final línea 2
+    const phrase2 = 'Solo dime lo que quieres, y lo sería por ti.';
+    const phrase3 = '';
+
+    function typeText(el, cursorEl, text, speed, cb){
+      let i = 0;
+      el.textContent = '';
+      function tick(){
+        if(i < text.length){
+          el.textContent += text[i++];
+          setTimeout(tick, speed + (Math.random()*speed*0.5));
+        } else { cb && cb(); }
+      }
+      tick();
+    }
+
+    function eraseText(el, speed, cb){
+      function tick(){
+        if(el.textContent.length > 0){
+          el.textContent = el.textContent.slice(0,-1);
+          setTimeout(tick, speed * 0.5);
+        } else { cb && cb(); }
+      }
+      tick();
+    }
+
+    // Timing aproximado total: ~22 seg
+    // phrase0[0]=2s, erase=0.8s  → phrase0[1]=0.8s, erase=0.5s → ...
+    // Al final: phrase1 aparece (3s), luego phrase2 grande (3s), luego fade
+
+    let t = 500; // delay inicial
+
+    // -- Línea 0: ciclo de frases --
+    function cyclePhrase(idx, done){
+      const txt = phrases0[idx];
+      const spd = Math.max(25, Math.floor(1100 / txt.length)); // velocidad adaptada
+      line0El.classList.add('show');
+      typeText(line0Text, line0Cur, txt, spd, () => {
+        if(idx >= phrases0.length - 1){ done(); return; }
+        setTimeout(() => {
+          eraseText(line0Text, 35, () => {
+            setTimeout(() => cyclePhrase(idx + 1, done), 120);
+          });
+        }, idx === 0 ? 600 : 300);
+      });
+    }
+
+    setTimeout(() => {
+      cyclePhrase(0, () => {
+        // Ocultar cursor de línea 0, mantener el texto final
+        line0Cur.style.display = 'none';
+
+        // -- Línea 1 aparece --
+        setTimeout(() => {
+          line1El.classList.add('show');
+          typeText(line1Text, line1Cur, phrase1, 35, () => {
+            line1Cur.style.display = 'none';
+
+            // -- Línea 2 grande: primera parte --
+            setTimeout(() => {
+              line2El.classList.add('show');
+              typeText(line2Text, line2Cur, phrase2, 38, () => {
+                line2Cur.style.display = 'none';
+
+                setTimeout(() => {
+                  eraseText(line2Text, 25, () => {
+                    line2Cur.style.display = 'inline-block';
+                    typeText(line2Text, line2Cur, phrase3, 48, () => {
+                      line2Cur.style.display = 'none';
+
+                      // Pausa final y fade a la carta
+                      setTimeout(() => {
+                        twRunning = false;
+                        twScreen.classList.add('fade-out');
+                        setTimeout(() => {
+                          twScreen.style.display = 'none';
+                        }, 1300);
+                      }, 1200);
+                    });
+                  });
+                }, 500);
+              });
+            }, 600);
+          });
+        }, 400);
+      });
+    }, t);
+  });
+})();
+</script>
+</body>
+</html>
